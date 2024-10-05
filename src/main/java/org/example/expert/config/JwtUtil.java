@@ -34,12 +34,13 @@ public class JwtUtil {
         key = Keys.hmacShaKeyFor(bytes);
     }
 
-    public String createToken(Long userId, String email, UserRole userRole) {
+    public String createToken(Long userId, String email, String nickName, UserRole userRole) {
         Date date = new Date();
 
         return BEARER_PREFIX +
                 Jwts.builder()
                         .setSubject(String.valueOf(userId))
+                        .claim("nickName", nickName)
                         .claim("email", email)
                         .claim("userRole", userRole)
                         .setExpiration(new Date(date.getTime() + TOKEN_TIME))
@@ -53,6 +54,10 @@ public class JwtUtil {
             return tokenValue.substring(7);
         }
         throw new ServerException("Not Found Token");
+    }
+
+    public String extractNickName(String token) {
+        return extractClaims(token).get("nickName", String.class);
     }
 
     public Claims extractClaims(String token) {
